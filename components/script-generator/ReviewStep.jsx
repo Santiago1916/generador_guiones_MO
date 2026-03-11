@@ -1,7 +1,10 @@
 "use client";
 
-import { ArrowRight, ClipboardCheck, Eye } from "lucide-react";
-import { formatFileSize } from "@/lib/script-generator";
+import { useEffect, useState } from "react";
+import { ArrowRight, ChevronDown, ClipboardCheck, Eye } from "lucide-react";
+import { formatFileSize, summarizeIssuesBySeverity } from "@/lib/script-generator";
+
+const VALIDATION_ACCORDION_STORAGE_KEY = "mo-script-generator-validation-accordion-open";
 
 export default function ReviewStep({
   result,
@@ -12,9 +15,33 @@ export default function ReviewStep({
   readyVideosCount,
   videosWithIssuesCount,
   pendingValidationCount,
+  repetitionReport,
+  balanceReport,
+  documentConfidence,
   onOpenReviewModal,
   onOpenExportStep,
 }) {
+  const [isValidationOpen, setIsValidationOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedValue = window.localStorage.getItem(VALIDATION_ACCORDION_STORAGE_KEY);
+    if (storedValue === "true") {
+      setIsValidationOpen(true);
+    }
+  }, []);
+
+  const severitySummary = summarizeIssuesBySeverity(result.validation.issues);
+
+  function handleValidationToggle(nextValue) {
+    setIsValidationOpen(nextValue);
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(VALIDATION_ACCORDION_STORAGE_KEY, String(nextValue));
+    }
+  }
+
   if (!result) {
     return (
       <div className="panel-card step-placeholder-card">
@@ -81,60 +108,134 @@ export default function ReviewStep({
         </article>
       </section>
 
+      <article className="panel-card compact-overview-card">
+        <div className="panel-heading panel-heading-tight">
+          <h3>Resumen rapido</h3>
+        </div>
+        <div className="issue-summary-list">
+          <article className="issue-summary">
+            <span className={`status-chip ${documentConfidence.tone === "success" ? "is-success" : documentConfidence.tone === "warning" ? "is-warning" : "is-error"}`}>
+              Lectura {documentConfidence.label}
+            </span>
+            <div>
+              <strong>Documento</strong>
+              <p>{documentConfidence.note}</p>
+            </div>
+          </article>
+
+          <article className="issue-summary">
+            <span className={`status-chip ${repetitionReport.tone === "success" ? "is-success" : "is-warning"}`}>
+              {repetitionReport.repeatedVideosCount} repeticiones
+            </span>
+            <div>
+              <strong>Guion</strong>
+              <p>{repetitionReport.note}</p>
+            </div>
+          </article>
+
+          <article className="issue-summary">
+            <span className={`status-chip ${balanceReport.tone === "success" ? "is-success" : "is-warning"}`}>
+              {balanceReport.outlierCount} por ajustar
+            </span>
+            <div>
+              <strong>Duracion por video</strong>
+              <p>{balanceReport.note}</p>
+            </div>
+          </article>
+        </div>
+      </article>
+
       <section className="analysis-grid">
-        <article className="panel-card">
-          <div className="panel-heading">
-            <h3>Validacion del documento</h3>
-            <div className="panel-heading-meta">
+        <details
+          className="panel-card accordion-card review-accordion"
+          open={isValidationOpen}
+          onToggle={(event) => handleValidationToggle(event.currentTarget.open)}
+        >
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy">
+              <h3>Validacion del documento</h3>
+              <p>
+                Abre esta seccion solo si quieres revisar faltantes, bloques detectados y
+                recomendaciones del archivo.
+              </p>
+            </div>
+
+            <div className="accordion-summary-meta">
               <span className="pill">
                 {result.file.name} | {formatFileSize(result.file.size)}
               </span>
               <span className="pill">{result.validation.profileLabel}</span>
+              {result.courseCategory?.label ? <span className="pill">{result.courseCategory.label}</span> : null}
+              {severitySummary.blocking ? <span className="status-chip is-error">{severitySummary.blocking} bloqueantes</span> : null}
+              {severitySummary.important ? <span className="status-chip is-warning">{severitySummary.important} importantes</span> : null}
+              {severitySummary.suggested ? <span className="status-chip is-success">{severitySummary.suggested} sugeridas</span> : null}
             </div>
-          </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
 
-          <div className="section-list">
-            {result.validation.sections.map((section) => (
-              <div key={section.id} className={`section-chip is-${section.severity}`}>
-                <strong>{section.label}</strong>
-                <span>{section.found ? `${section.wordCount} palabras detectadas` : "No encontrada"}</span>
-                <small>{section.detail}</small>
-                <small>{section.hint}</small>
+          <div className="accordion-content">
+            <div className="section-list">
+              {result.validation.sections.map((section) => (
+                <div key={section.id} className={`section-chip is-${section.severity}`}>
+                  <strong>{section.label}</strong>
+                  <span>{section.found ? `${section.wordCount} palabras detectadas` : "No encontrada"}</span>
+                  <small>{section.detail}</small>
+                  <small>{section.hint}</small>
+                </div>
+              ))}
+            </div>
+
+            {result.validation.issues.length ? (
+              <div className="notes-box">
+                <h4>Exactamente que revisar</h4>
+                <div className="issue-summary-list">
+                  {result.validation.issues.map((issue) => (
+                    <article key={issue.id} className={`issue-summary issue-${issue.level}`}>
+                      <span className={`status-chip ${issue.severity === "blocking" ? "is-error" : issue.severity === "important" ? "is-warning" : "is-success"}`}>
+                        {issue.severity === "blocking"
+                          ? "Bloqueante"
+                          : issue.severity === "important"
+                            ? "Importante"
+                            : "Sugerida"}
+                      </span>
+                      <div>
+                        <strong>{issue.title}</strong>
+                        <p>{issue.detail}</p>
+                        <p>{issue.hint}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            ) : null}
 
-          {result.validation.issues.length ? (
+            {result.recommendations.length ? (
+              <div className="notes-box">
+                <h4>Recomendaciones</h4>
+                <ul className="compact-list">
+                  {result.recommendations.map((note) => (
+                    <li key={note}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
             <div className="notes-box">
-              <h4>Exactamente que revisar</h4>
+              <h4>Calidad de lectura del archivo</h4>
               <div className="issue-summary-list">
-                {result.validation.issues.map((issue) => (
-                  <article key={issue.id} className={`issue-summary issue-${issue.level}`}>
-                    <span className={`status-chip ${issue.level === "error" ? "is-error" : "is-warning"}`}>
-                      {issue.level === "error" ? "Falta clave" : "Revisar"}
-                    </span>
-                    <div>
-                      <strong>{issue.title}</strong>
-                      <p>{issue.detail}</p>
-                      <p>{issue.hint}</p>
-                    </div>
-                  </article>
-                ))}
+                <article className="issue-summary">
+                  <span className={`status-chip ${documentConfidence.tone === "success" ? "is-success" : documentConfidence.tone === "warning" ? "is-warning" : "is-error"}`}>
+                    {documentConfidence.label}
+                  </span>
+                  <div>
+                    <strong>Confianza de extraccion</strong>
+                    <p>{documentConfidence.note}</p>
+                  </div>
+                </article>
               </div>
             </div>
-          ) : null}
-
-          {result.recommendations.length ? (
-            <div className="notes-box">
-              <h4>Recomendaciones</h4>
-              <ul className="compact-list">
-                {result.recommendations.map((note) => (
-                  <li key={note}>{note}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </article>
+          </div>
+        </details>
 
         <article className="panel-card panel-stack">
           <div>
@@ -183,6 +284,7 @@ export default function ReviewStep({
                   </p>
                 </div>
               </article>
+
             </div>
           </div>
         </article>

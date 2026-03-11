@@ -11,6 +11,9 @@ export default function ExportStep({
   reviewedVideoIds,
   editableVideos,
   validationReport,
+  repetitionReport,
+  balanceReport,
+  documentConfidence,
   actionError,
   actionMessage,
   onOpenFinalPreview,
@@ -61,6 +64,43 @@ export default function ExportStep({
           </p>
         </article>
       </section>
+
+      <article className="panel-card compact-overview-card">
+        <div className="panel-heading panel-heading-tight">
+          <h3>Chequeo rapido antes de descargar</h3>
+        </div>
+        <div className="issue-summary-list">
+          <article className="issue-summary">
+            <span className={`status-chip ${documentConfidence.tone === "success" ? "is-success" : documentConfidence.tone === "warning" ? "is-warning" : "is-error"}`}>
+              Lectura {documentConfidence.label}
+            </span>
+            <div>
+              <strong>Documento</strong>
+              <p>{documentConfidence.note}</p>
+            </div>
+          </article>
+
+          <article className="issue-summary">
+            <span className={`status-chip ${repetitionReport.tone === "success" ? "is-success" : "is-warning"}`}>
+              {repetitionReport.repeatedVideosCount} repeticiones
+            </span>
+            <div>
+              <strong>Guion</strong>
+              <p>{repetitionReport.note}</p>
+            </div>
+          </article>
+
+          <article className="issue-summary">
+            <span className={`status-chip ${balanceReport.tone === "success" ? "is-success" : "is-warning"}`}>
+              {balanceReport.outlierCount} por ajustar
+            </span>
+            <div>
+              <strong>Duracion por video</strong>
+              <p>{balanceReport.note}</p>
+            </div>
+          </article>
+        </div>
+      </article>
 
       <article className={`panel-card final-step-card tone-${overallStatus.tone} tour-export-card`}>
         <div className="final-step-copy">

@@ -17,6 +17,16 @@ const requestSchema = z.object({
     )
     .min(1)
     .max(12),
+  customDictionary: z.array(z.string().trim().min(1).max(120)).max(300).optional(),
+  ignoredIssues: z
+    .array(
+      z.object({
+        videoId: z.string().trim().min(1).max(80),
+        issueKeys: z.array(z.string().trim().min(1).max(320)).max(120),
+      })
+    )
+    .max(40)
+    .optional(),
 });
 
 function compactText(value = "") {
@@ -27,6 +37,101 @@ function buildContextSnippet(text = "", index = 0, length = 1) {
   const start = Math.max(0, index - 36);
   const end = Math.min(text.length, index + length + 36);
   return compactText(text.slice(start, end));
+}
+
+function normalizeDictionaryEntry(value = "") {
+  return compactText(String(value)).toLocaleLowerCase("es");
+}
+
+function getIssueSeverity(issue = {}) {
+  if (issue.source === "service") {
+    return {
+      severity: "blocking",
+      blocksDownload: true,
+    };
+  }
+
+  if (issue.source === "local" && issue.message.includes("frase muy larga")) {
+    return {
+      severity: "suggested",
+      blocksDownload: false,
+    };
+  }
+
+  const issueType = issue.issueType || "";
+
+  if (issueType === "grammar" || issueType === "misspelling") {
+    return {
+      severity: "blocking",
+      blocksDownload: true,
+    };
+  }
+
+  if (issueType === "typographical" || issueType === "duplication" || issueType === "whitespace") {
+    return {
+      severity: "important",
+      blocksDownload: true,
+    };
+  }
+
+  if (issueType === "inconsistency") {
+    return {
+      severity: "suggested",
+      blocksDownload: false,
+    };
+  }
+
+  if (
+    issue.message.includes("signos de puntuacion repetidos") ||
+    issue.message.includes("espacio antes de un signo") ||
+    issue.message.includes("Falta un espacio despues")
+  ) {
+    return {
+      severity: "important",
+      blocksDownload: true,
+    };
+  }
+
+  return {
+    severity: "suggested",
+    blocksDownload: false,
+  };
+}
+
+function buildIssueKey(issue = {}) {
+  return [
+    issue.source || "",
+    issue.ruleId || issue.issueType || "",
+    issue.message || "",
+    Number.isFinite(issue.offset) ? issue.offset : "",
+    Number.isFinite(issue.length) ? issue.length : "",
+    compactText(issue.matchText || issue.context || ""),
+  ].join("::");
+}
+
+function extractDictionaryCandidate(issue = {}) {
+  const baseValue = compactText(issue.matchText || "");
+  if (!baseValue) return "";
+
+  const cleaned = baseValue.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
+  if (!cleaned) return "";
+
+  const words = cleaned.split(/\s+/).filter(Boolean);
+  if (!words.length || words.length > 3) return "";
+
+  return words.join(" ").slice(0, 120);
+}
+
+function enrichIssue(issue = {}) {
+  const dictionaryCandidate = extractDictionaryCandidate(issue);
+  const severityState = getIssueSeverity(issue);
+
+  return {
+    ...issue,
+    ...severityState,
+    issueKey: buildIssueKey(issue),
+    dictionaryCandidate,
+  };
 }
 
 function pushRegexIssues({ text, regex, message, issues, max = 3, buildSuggestions, lengthResolver }) {
@@ -127,25 +232,27 @@ function mapLanguageToolMatches(sourceText = "", matches = []) {
       return relevantIssueTypes.has(issueType);
     })
     .slice(0, 12)
-    .map((match) => ({
-      source: "languagetool",
-      message: match.message || "Se encontro una observacion ortografica o gramatical.",
-      context: compactText(match.context?.text || ""),
-      suggestions: Array.isArray(match.replacements)
-        ? match.replacements
-            .slice(0, 4)
-            .map((replacement) => replacement?.value)
-            .filter(Boolean)
-        : [],
-      offset: Number.isFinite(match.offset) ? match.offset : null,
-      length: Number.isFinite(match.length) ? match.length : null,
-      matchText:
-        Number.isFinite(match.offset) && Number.isFinite(match.length)
-          ? String(sourceText).slice(match.offset, match.offset + match.length)
-          : "",
-      ruleId: match.rule?.id || "",
-      issueType: match.rule?.issueType || "",
-    }));
+    .map((match) =>
+      enrichIssue({
+        source: "languagetool",
+        message: match.message || "Se encontro una observacion ortografica o gramatical.",
+        context: compactText(match.context?.text || ""),
+        suggestions: Array.isArray(match.replacements)
+          ? match.replacements
+              .slice(0, 4)
+              .map((replacement) => replacement?.value)
+              .filter(Boolean)
+          : [],
+        offset: Number.isFinite(match.offset) ? match.offset : null,
+        length: Number.isFinite(match.length) ? match.length : null,
+        matchText:
+          Number.isFinite(match.offset) && Number.isFinite(match.length)
+            ? String(sourceText).slice(match.offset, match.offset + match.length)
+            : "",
+        ruleId: match.rule?.id || "",
+        issueType: match.rule?.issueType || "",
+      })
+    );
 }
 
 async function validateWithLanguageTool(text = "") {
@@ -188,10 +295,14 @@ export async function POST(request) {
     }
 
     let serviceAvailable = true;
+    const customDictionarySet = new Set((parsed.data.customDictionary || []).map(normalizeDictionaryEntry));
+    const ignoredIssuesMap = new Map(
+      (parsed.data.ignoredIssues || []).map((entry) => [entry.videoId, new Set(entry.issueKeys)])
+    );
 
     const reviewedVideos = await Promise.all(
       parsed.data.videos.map(async (video) => {
-        const localIssues = collectLocalWritingIssues(video.scriptText);
+        const localIssues = collectLocalWritingIssues(video.scriptText).map(enrichIssue);
         let orthographyIssues = [];
 
         try {
@@ -200,26 +311,43 @@ export async function POST(request) {
           serviceAvailable = false;
         }
 
-        const issues = [...localIssues, ...orthographyIssues];
+        let issues = [...localIssues, ...orthographyIssues];
 
         if (!serviceAvailable && orthographyIssues.length === 0) {
-          issues.unshift({
-            source: "service",
-            message:
-              "No fue posible completar la revision ortografica externa. Intenta nuevamente antes de descargar el PDF.",
-            context: "",
-            suggestions: [],
-            offset: null,
-            length: null,
-            matchText: "",
-          });
+          issues.unshift(
+            enrichIssue({
+              source: "service",
+              message:
+                "No fue posible completar la revision ortografica externa. Intenta nuevamente antes de descargar el PDF.",
+              context: "",
+              suggestions: [],
+              offset: null,
+              length: null,
+              matchText: "",
+            })
+          );
         }
+
+        const ignoredIssueKeys = ignoredIssuesMap.get(video.id) || new Set();
+        issues = issues.filter((issue) => {
+          if (ignoredIssueKeys.has(issue.issueKey)) return false;
+
+          if (issue.dictionaryCandidate) {
+            const normalizedCandidate = normalizeDictionaryEntry(issue.dictionaryCandidate);
+            if (normalizedCandidate && customDictionarySet.has(normalizedCandidate)) {
+              return false;
+            }
+          }
+
+          return true;
+        });
 
         return {
           id: video.id,
           title: video.title,
-          passed: issues.length === 0,
+          passed: issues.every((issue) => !issue.blocksDownload),
           issueCount: issues.length,
+          blockingIssueCount: issues.filter((issue) => issue.blocksDownload).length,
           issues,
         };
       })

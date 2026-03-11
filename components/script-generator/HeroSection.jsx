@@ -32,18 +32,6 @@ export default function HeroSection({ onStartTour, onDownloadTemplate, onJumpToU
               Ver guia interactiva
             </span>
           </button>
-          <button type="button" className="ghost-button hero-action-button" onClick={onJumpToUpload}>
-            <span className="button-content">
-              <MousePointerClick size={18} />
-              Ir al paso 1
-            </span>
-          </button>
-          <button type="button" className="ghost-button hero-action-button" onClick={onDownloadTemplate}>
-            <span className="button-content">
-              <FileDown size={18} />
-              Descargar formato
-            </span>
-          </button>
         </div>
       </div>
 

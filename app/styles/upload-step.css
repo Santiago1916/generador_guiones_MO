@@ -4,6 +4,12 @@
   margin-bottom: 1rem;
 }
 
+.sidebar-card {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
 .card-intro h2,
 .sidebar-card h3,
 .formula-label,
@@ -13,7 +19,7 @@
 }
 
 .dropzone {
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px dashed rgba(112, 130, 185, 0.46);
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.66), rgba(236, 242, 255, 0.48)),
@@ -30,8 +36,8 @@
 .dropzone:hover,
 .dropzone.is-dragging {
   transform: translateY(-2px);
-  border-color: rgba(43, 27, 128, 0.42);
-  box-shadow: 0 20px 34px rgba(43, 27, 128, 0.08);
+  border-color: rgba(46, 125, 224, 0.34);
+  box-shadow: 0 16px 28px rgba(46, 125, 224, 0.08);
 }
 
 .dropzone.has-file {
@@ -104,6 +110,14 @@
   gap: 0.8rem;
 }
 
+.upload-accordion .accordion-summary {
+  padding: 0.95rem 1rem;
+}
+
+.upload-accordion .accordion-content {
+  padding-top: 0;
+}
+
 .onboarding-note {
   display: grid;
   gap: 0.7rem;
@@ -112,6 +126,10 @@
 .formula-card,
 .template-card {
   margin-top: 1rem;
+}
+
+.full-button {
+  width: 100%;
 }
 
 @media (max-width: 720px) {

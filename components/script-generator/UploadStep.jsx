@@ -1,6 +1,6 @@
 "use client";
 
-import { FileCog, FolderOpen, ScanSearch, WandSparkles } from "lucide-react";
+import { ChevronDown, FileCog, FolderOpen, ScanSearch, WandSparkles } from "lucide-react";
 import { ACCEPTED_TYPES, formatFileSize } from "@/lib/script-generator";
 
 export default function UploadStep({
@@ -9,9 +9,12 @@ export default function UploadStep({
   dragActive,
   error,
   isProcessing,
+  selectedCourseType,
+  courseTypeOptions,
   onSubmit,
   onChooseFile,
   onSelectFile,
+  onCourseTypeChange,
   onDragEnter,
   onDragOver,
   onDragLeave,
@@ -21,11 +24,25 @@ export default function UploadStep({
   return (
     <section className="workspace-grid">
       <form className="composer-card tour-upload-panel" onSubmit={onSubmit}>
-        <div className="card-intro">
-          <span className="eyebrow">Paso 1</span>
-          <h2>Carga el documento base del curso</h2>
+        <div className="course-type-field">
+          <label className="field-label" htmlFor="course-type">
+            Tipo de curso
+          </label>
+          <select
+            id="course-type"
+            className="course-type-select"
+            value={selectedCourseType}
+            onChange={(event) => onCourseTypeChange(event.target.value)}
+          >
+            {courseTypeOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
           <p className="supporting-text">
-            Puede ser un curso SG-SST o un tema general por modulos y subtemas.
+            Puedes dejar la deteccion automatica o dar una categoria base para mejorar reglas,
+            frases y validaciones del guion.
           </p>
         </div>
 
@@ -98,57 +115,103 @@ export default function UploadStep({
       </form>
 
       <aside className="sidebar-card">
-        <div className="usage-card">
-          <strong>Como usarlo sin perderte</strong>
-          <ol className="guide-list">
-            <li>Sube el documento base del curso.</li>
-            <li>Revisa el semaforo y el bloque de validacion.</li>
-            <li>Abre los videos que necesiten ajuste.</li>
-            <li>Valida escritura y descarga el PDF final.</li>
-          </ol>
-        </div>
+        <details className="accordion-card upload-accordion">
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy is-title-only">
+              <h3>Como usarlo sin perderte</h3>
+            </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
 
-        <h3>Que hace esta version</h3>
-        <ul className="checklist">
-          <li>Que el archivo sea PDF, DOC o DOCX.</li>
-          <li>Que el documento tenga una estructura clara por secciones, modulos o subtemas.</li>
-          <li>Que cada documento genere un dialogo distinto segun el contenido detectado.</li>
-          <li>Que el sistema marque si un PDF parece escaneado y necesita OCR.</li>
-          <li>Que puedas comparar el texto original contra el guion en un modal editable.</li>
-          <li>Que haya correcciones rapidas con un clic cuando la revision encuentre sugerencias aplicables.</li>
-          <li>Que el PDF final solo se descargue si pasa la validacion de escritura y ortografia.</li>
-        </ul>
+          <div className="accordion-content usage-card">
+            <ol className="guide-list">
+              <li>Sube el documento base del curso.</li>
+              <li>Revisa el semaforo y el bloque de validacion.</li>
+              <li>Abre los videos que necesiten ajuste.</li>
+              <li>Valida escritura y descarga el PDF final.</li>
+            </ol>
+          </div>
+        </details>
 
-        <div className="formula-card">
-          <span className="formula-label">Formula base</span>
-          <code>palabras / 140 * 60 + 20 segundos por video</code>
-        </div>
+        <details className="accordion-card upload-accordion">
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy is-title-only">
+              <h3>Que hace esta version</h3>
+            </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
 
-        <div className="template-card tour-template-card">
-          <strong>Plantilla de documento ejemplo</strong>
-          <p>
-            Descarga un formato recomendado general para cursos, capacitaciones y temas distintos,
-            no solo para una estructura fija de SG-SST.
-          </p>
-          <button type="button" className="ghost-button full-button" onClick={onDownloadTemplate}>
-            <span className="button-content">
-              <FileCog size={18} />
-              Descargar formato recomendado
-            </span>
-          </button>
-        </div>
+          <div className="accordion-content">
+            <ul className="checklist">
+              <li>Que el archivo sea PDF, DOC o DOCX.</li>
+              <li>Que el documento tenga una estructura clara por secciones, modulos o subtemas.</li>
+              <li>Que cada documento genere un dialogo distinto segun el contenido detectado.</li>
+              <li>Que el sistema marque si un PDF parece escaneado y necesita OCR.</li>
+              <li>Que puedas comparar el texto original contra el guion en un modal editable.</li>
+              <li>Que haya correcciones rapidas con un clic cuando la revision encuentre sugerencias aplicables.</li>
+              <li>Que el PDF final solo se descargue si pasa la validacion de escritura y ortografia.</li>
+            </ul>
+          </div>
+        </details>
 
-        <div className="notes-box onboarding-note">
-          <h4>Atajo recomendado</h4>
-          <p className="supporting-text">
-            Si es la primera vez que un asesor usa esta herramienta, puede iniciar la guia
-            interactiva desde la parte superior y seguirla con clics simples.
-          </p>
-          <span className="pill">
-            <ScanSearch size={14} />
-            Tour explicado paso a paso
-          </span>
-        </div>
+        <details className="accordion-card upload-accordion">
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy is-title-only">
+              <h3>Formula base</h3>
+            </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
+
+          <div className="accordion-content">
+            <div className="formula-card">
+              <code>palabras / 140 * 60 + 20 segundos por video</code>
+            </div>
+          </div>
+        </details>
+
+        <details className="accordion-card upload-accordion tour-template-card">
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy is-title-only">
+              <h3>Plantilla de documento ejemplo</h3>
+            </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
+
+          <div className="accordion-content template-card">
+            <p>
+              Descarga un formato recomendado general para cursos, capacitaciones y temas distintos,
+              no solo para una estructura fija de SG-SST.
+            </p>
+            <button type="button" className="ghost-button full-button" onClick={onDownloadTemplate}>
+              <span className="button-content">
+                <FileCog size={18} />
+                Descargar formato recomendado
+              </span>
+            </button>
+          </div>
+        </details>
+
+        <details className="accordion-card upload-accordion">
+          <summary className="accordion-summary">
+            <div className="accordion-summary-copy is-title-only">
+              <h3>Atajo recomendado</h3>
+            </div>
+            <ChevronDown size={18} className="accordion-summary-indicator" />
+          </summary>
+
+          <div className="accordion-content">
+            <div className="notes-box onboarding-note">
+              <p className="supporting-text">
+                Si es la primera vez que un asesor usa esta herramienta, puede iniciar la guia
+                interactiva desde la parte superior y seguirla con clics simples.
+              </p>
+              <span className="pill">
+                <ScanSearch size={14} />
+                Tour explicado paso a paso
+              </span>
+            </div>
+          </div>
+        </details>
       </aside>
     </section>
   );

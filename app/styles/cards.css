@@ -1,0 +1,146 @@
+.hero-panel,
+.composer-card,
+.sidebar-card,
+.metric-card,
+.panel-card,
+.modal-card,
+.compare-panel,
+.stepper-node,
+.step-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+}
+
+.panel-heading,
+.compare-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+.panel-heading {
+  margin-bottom: 1rem;
+}
+
+.panel-heading h3,
+.compare-heading h3 {
+  margin: 0;
+}
+
+.panel-heading-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.panel-heading-tight {
+  margin-bottom: 0;
+}
+
+.notes-box,
+.formula-card,
+.template-card {
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.05rem;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid rgba(140, 160, 209, 0.24);
+}
+
+.notes-box h4 {
+  margin: 0 0 0.5rem;
+  color: var(--brand);
+}
+
+.warning-box {
+  border-color: rgba(209, 143, 20, 0.28);
+}
+
+.danger-box {
+  border-color: rgba(217, 77, 106, 0.28);
+}
+
+.success-box {
+  border-color: rgba(29, 156, 110, 0.28);
+}
+
+.section-list,
+.issue-list,
+.issue-summary-list,
+.history-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.section-chip,
+.issue-card,
+.issue-summary,
+.history-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.9rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(120, 143, 192, 0.26);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.section-chip strong,
+.issue-card strong,
+.issue-summary strong,
+.history-card strong {
+  font-size: 0.95rem;
+}
+
+.section-chip span,
+.issue-card p,
+.issue-summary p,
+.history-note {
+  font-size: 0.86rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.section-chip.is-success {
+  border-color: rgba(29, 156, 110, 0.24);
+}
+
+.section-chip.is-warning {
+  border-color: rgba(209, 143, 20, 0.24);
+}
+
+.section-chip.is-error,
+.issue-summary.issue-error {
+  border-color: rgba(217, 77, 106, 0.28);
+}
+
+.issue-summary.issue-warning {
+  border-color: rgba(209, 143, 20, 0.28);
+}
+
+.issue-summary {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+}
+
+.history-card-head,
+.issue-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+@media (max-width: 720px) {
+  .panel-heading,
+  .compare-heading,
+  .history-card-head,
+  .issue-card-header,
+  .issue-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

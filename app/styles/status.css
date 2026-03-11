@@ -1,0 +1,64 @@
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(46, 125, 224, 0.1);
+  color: var(--info-strong);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dropzone-badge,
+.pill,
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(46, 125, 224, 0.08);
+  border: 1px solid rgba(112, 130, 185, 0.22);
+  color: var(--info-strong);
+  font-size: 0.79rem;
+  font-weight: 700;
+}
+
+.status-chip {
+  white-space: nowrap;
+}
+
+.status-chip.is-success {
+  color: var(--success);
+  border-color: rgba(29, 156, 110, 0.28);
+  background: rgba(29, 156, 110, 0.08);
+}
+
+.status-chip.is-warning {
+  color: var(--warning);
+  border-color: rgba(209, 143, 20, 0.28);
+  background: rgba(209, 143, 20, 0.08);
+}
+
+.status-chip.is-error {
+  color: var(--danger);
+  border-color: rgba(217, 77, 106, 0.28);
+  background: rgba(217, 77, 106, 0.08);
+}
+
+.feedback {
+  margin: 0.8rem 0 0;
+  font-weight: 700;
+}
+
+.error-text {
+  color: var(--danger);
+}
+
+.success-text {
+  color: var(--success);
+}

@@ -21,11 +21,14 @@ export default function StepPanel({
   isOpen,
   isDisabled = false,
   statusLabels,
+  className = "",
   onToggle,
   children,
 }) {
   return (
-    <section className={`step-panel ${isOpen ? "is-open" : ""} ${isDisabled ? "is-disabled" : ""}`}>
+    <section
+      className={`step-panel ${isOpen ? "is-open" : ""} ${isDisabled ? "is-disabled" : ""} ${className}`.trim()}
+    >
       <button type="button" className="step-panel-header" onClick={onToggle} disabled={isDisabled}>
         <div className="step-panel-copy">
           <span className="eyebrow">{eyebrow}</span>

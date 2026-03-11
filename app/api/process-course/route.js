@@ -15,6 +15,7 @@ export async function POST(request) {
   try {
     const formData = await request.formData();
     const file = formData.get("file");
+    const courseType = String(formData.get("courseType") || "auto");
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "Debes subir un archivo del curso." }, { status: 400 });
@@ -42,6 +43,7 @@ export async function POST(request) {
     const extracted = await extractTextFromUpload(file);
     const analysis = analyzeCourseText(extracted.text, {
       extractionDiagnostics: extracted.diagnostics,
+      preferredCourseType: courseType,
     });
 
     return NextResponse.json({

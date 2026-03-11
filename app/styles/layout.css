@@ -1,6 +1,7 @@
 .workspace-grid,
 .coach-grid,
 .summary-grid,
+.signal-grid,
 .analysis-grid,
 .validation-grid,
 .compare-grid {
@@ -18,6 +19,10 @@
 
 .summary-grid-wide {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.signal-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .analysis-grid {
@@ -44,7 +49,7 @@
 }
 
 .metric-card {
-  min-height: 156px;
+  min-height: 124px;
 }
 
 .metric-label {
@@ -58,8 +63,8 @@
 .metric-card strong,
 .quick-stat strong {
   display: block;
-  margin: 0.55rem 0 0.2rem;
-  font-size: clamp(1.8rem, 3vw, 2.45rem);
+  margin: 0.35rem 0 0.2rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.9rem);
   letter-spacing: -0.05em;
   color: color-mix(in srgb, var(--brand) 76%, var(--text) 24%);
 }
@@ -84,6 +89,7 @@
 
 @media (max-width: 1180px) {
   .coach-grid,
+  .signal-grid,
   .summary-grid-wide {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -92,6 +98,7 @@
 @media (max-width: 1080px) {
   .workspace-grid,
   .coach-grid,
+  .signal-grid,
   .analysis-grid,
   .validation-grid,
   .compare-grid {
@@ -107,7 +114,7 @@
   .modal-card,
   .compare-panel {
     padding: 1rem;
-    border-radius: 22px;
+    border-radius: var(--radius-xl);
   }
 
   .summary-grid-wide {
