@@ -1,0 +1,250 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  padding: 1rem;
+  background: rgba(16, 35, 72, 0.42);
+  display: grid;
+  place-items: center;
+}
+
+.modal-card {
+  width: min(1180px, calc(100vw - 1rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.review-modal,
+.final-preview-modal {
+  display: grid;
+  gap: 1rem;
+}
+
+.modal-top,
+.modal-actions,
+.library-actions,
+.issue-actions-row,
+.stats-row,
+.review-progress-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.modal-top {
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.modal-close {
+  width: auto;
+}
+
+.review-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.32fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.review-sidebar,
+.review-main,
+.compare-panel {
+  min-width: 0;
+}
+
+.review-sidebar {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.review-sidebar h3 {
+  margin: 0;
+  color: var(--brand);
+}
+
+.review-sidebar-list {
+  display: grid;
+  gap: 0.7rem;
+  max-height: min(64vh, 860px);
+  overflow: auto;
+}
+
+.review-sidebar-item {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border-radius: 18px;
+  border: 1px solid rgba(120, 143, 192, 0.26);
+  background: rgba(255, 255, 255, 0.44);
+  text-align: left;
+}
+
+.review-sidebar-item.is-active {
+  border-color: rgba(43, 27, 128, 0.26);
+}
+
+.review-sidebar-item strong,
+.review-sidebar-item span,
+.final-preview-head p {
+  display: block;
+  margin: 0;
+}
+
+.review-sidebar-item span,
+.review-sidebar-item p {
+  color: var(--muted);
+}
+
+.review-main {
+  display: grid;
+  gap: 1rem;
+}
+
+.modal-guide {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.guide-tip {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(120, 143, 192, 0.26);
+  background: rgba(255, 255, 255, 0.48);
+  padding: 0.9rem;
+}
+
+.guide-tip strong {
+  color: var(--brand);
+}
+
+.guide-tip p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.compare-panel {
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.editor-label {
+  display: inline-block;
+  margin-bottom: 0.55rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.modal-textarea,
+.source-text-block {
+  width: 100%;
+  min-height: 360px;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--input-border);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  line-height: 1.72;
+}
+
+.modal-textarea {
+  resize: vertical;
+  outline: none;
+}
+
+.modal-textarea:focus {
+  border-color: rgba(53, 191, 237, 0.78);
+  box-shadow: 0 0 0 4px rgba(53, 191, 237, 0.14);
+}
+
+.source-text-block {
+  margin-top: 0.75rem;
+  overflow: auto;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.library-group {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.library-group strong,
+.issue-suggestion {
+  color: var(--brand);
+}
+
+.library-button,
+.issue-action-button {
+  min-height: 42px;
+  padding: 0.7rem 0.9rem;
+}
+
+.correction-history-box {
+  margin-top: 1rem;
+}
+
+.modal-actions {
+  justify-content: space-between;
+  margin-top: 1rem;
+  position: sticky;
+  bottom: 0;
+  padding-top: 1rem;
+}
+
+.is-reviewed-toggle {
+  border-color: rgba(29, 156, 110, 0.28);
+  background: rgba(29, 156, 110, 0.1);
+  color: var(--success);
+}
+
+@media (max-width: 1080px) {
+  .review-layout,
+  .compare-grid,
+  .modal-guide {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-card {
+    width: min(100vw - 0.5rem, 100%);
+    max-height: calc(100vh - 1rem);
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  .modal-top,
+  .modal-actions,
+  .library-actions,
+  .issue-actions-row,
+  .review-progress-bar {
+    display: grid;
+    width: 100%;
+  }
+
+  .modal-close,
+  .library-button,
+  .issue-action-button,
+  .modal-primary {
+    width: 100%;
+  }
+
+  .modal-textarea,
+  .source-text-block {
+    min-height: 280px;
+  }
+
+  .review-sidebar-list {
+    max-height: none;
+    overflow: visible;
+  }
+}

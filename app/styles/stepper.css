@@ -1,0 +1,156 @@
+.stepper-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.stepper-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.stepper-node {
+  border-radius: 18px;
+  padding: 0.95rem 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  border-color: rgba(255, 255, 255, 0.78);
+  text-align: left;
+}
+
+.stepper-node:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.stepper-node.is-open {
+  border-color: rgba(43, 27, 128, 0.28);
+}
+
+.stepper-node.is-done {
+  border-color: rgba(29, 156, 110, 0.24);
+}
+
+.stepper-node-number {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  background: rgba(43, 27, 128, 0.1);
+  color: var(--brand);
+  font-weight: 800;
+}
+
+.stepper-node.is-done .stepper-node-number {
+  background: rgba(29, 156, 110, 0.12);
+  color: var(--success);
+}
+
+.stepper-node-copy {
+  display: grid;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.stepper-node-copy strong {
+  color: var(--brand);
+  font-size: 0.96rem;
+}
+
+.stepper-node-copy small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.step-panel {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.step-panel.is-disabled {
+  opacity: 0.86;
+}
+
+.step-panel-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.1rem;
+  background: transparent;
+  border: 0;
+  text-align: left;
+}
+
+.step-panel-copy {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.step-panel-copy h2,
+.final-step-copy h2 {
+  margin: 0;
+  color: var(--brand);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+}
+
+.step-panel-copy p,
+.final-step-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.step-panel-body {
+  padding: 0 1.1rem 1.1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.step-placeholder-card,
+.final-step-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.final-step-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.final-step-button {
+  width: auto;
+}
+
+@media (max-width: 1180px) {
+  .stepper-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1080px) {
+  .stepper-nav {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .step-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .final-step-button {
+    width: 100%;
+  }
+
+  .step-panel-body {
+    padding: 0 1rem 1rem;
+  }
+}

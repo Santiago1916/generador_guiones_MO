@@ -1,0 +1,29 @@
+{
+  "name": "generador_guiones_mo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "docx": "^9.6.1",
+    "driver.js": "^1.4.0",
+    "jspdf": "^4.2.0",
+    "lucide-react": "^0.577.0",
+    "mammoth": "^1.11.0",
+    "next": "14.2.35",
+    "pdf-parse": "^2.4.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "word-extractor": "^1.0.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35"
+  }
+}
